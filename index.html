@@ -1,0 +1,33 @@
+<html>
+   <head>
+      <meta charset="UTF-8">
+      <script type="text/javascript" src="https://cdn.plot.ly/plotly-latest.min.js"> </script>
+   </head>
+   <body>
+      <div id="Plotter"> </div>
+   <!--   <script src="logic.js"> </script> -->
+   <script>
+// WEBSOCKETS STUFF BELOW
+var ws = new WebSocket("ws://localhost");
+var plotEl = document.getElementById('Plotter');
+var isFirst = true
+var updatePoint = {};
+
+// With much help from: http://codepen.io/plotly/pen/LGEyyY?editors=101
+ws.onmessage = function (event) {
+   var datum = JSON.parse(event.data);
+
+   if (isFirst) {
+      var firstPoint =   [{ x: [datum.X], y: [datum.Y]}];
+      Plotly.plot(plotEl, firstPoint , { title: 'Random Over Time'});
+      isFirst = false;
+   } else {
+      // reshape datum for extendTraces
+      updatePoint.x = [[datum.X]];
+      updatePoint.y = [[datum.Y]];
+      Plotly.extendTraces(plotEl, updatePoint, [0], 10);
+   }
+}
+   </script>
+   </body>
+</html>
